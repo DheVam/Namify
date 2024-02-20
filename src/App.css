@@ -3,9 +3,6 @@
   padding: 0;
 }
 
-.header{
-  font-size: 5rem;
-}
 
 .App {
   text-align: center;
@@ -42,7 +39,7 @@ padding: 0;
 margin: 0;
 padding-left: 10px;
 outline: none;
-width: 90%;
+width: 30%;
 }
 
 
@@ -74,12 +71,15 @@ width: 90%;
 .user-card.other-hair {
   color: black;
 }
+.card-text{
+  margin-top: 0;
+  margin-bottom: 0 !important;
+}
 .pagination {
   margin-top: 20px;
   display: flex;
-
-justify-content: center;
-align-items: center;
+  justify-content: center;
+  align-items: center;
 }
 
 button {
