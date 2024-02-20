@@ -11,7 +11,7 @@ import {
   Empty,
   Image,
 } from "antd";
-import Logo from "./Images/Logo.png";
+import Logo from "./Images/CompanyLogo.png";
 
 import "antd/dist/reset.css";
 import "./App.css";
