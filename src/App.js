@@ -3,13 +3,13 @@ import axios from "axios";
 import {
   AutoComplete,
   Spin,
-  Card,
-  Pagination,
+  Table,
   Typography,
   Input,
-  Flex,
   Empty,
   Image,
+  Pagination,
+  Space,
 } from "antd";
 import Logo from "./Images/CompanyLogo.png";
 
@@ -70,12 +70,103 @@ const App = () => {
     debouncedFetch(1);
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  const columns = [
+    {
+      title: "Avatar",
+      dataIndex: "avatar",
+      key: "avatar",
+      render: (text, record) => (
+        <Image
+          alt={record.name}
+          src={getRandomImage()}
+          width={50}
+          height={50}
+          style={{ borderRadius: "50%" }}
+        />
+      ),
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      filters: filteredUsers.map((user) => ({
+        text: user.name,
+        value: user.name,
+      })),
+      onFilter: (value, record) => record.name === value,
+    },
+    {
+      title: "Hair Color",
+      dataIndex: "hair_color",
+      key: "hair_color",
+      filters: filteredUsers
+        .map((user) => user.hair_color)
+        .filter((value, index, self) => self.indexOf(value) === index)
+        .map((hairColor) => ({
+          text: hairColor,
+          value: hairColor,
+        })),
+      onFilter: (value, record) => record.hair_color === value,
+    },
+    {
+      title: "Skin Color",
+      dataIndex: "skin_color",
+      key: "skin_color",
+      filters: filteredUsers
+        .map((user) => user.skin_color)
+        .filter((value, index, self) => self.indexOf(value) === index)
+        .map((skinColor) => ({
+          text: skinColor,
+          value: skinColor,
+        })),
+      onFilter: (value, record) => record.skin_color === value,
+    },
+    {
+      title: "Gender",
+      dataIndex: "gender",
+      key: "gender",
+      filters: filteredUsers
+        .map((user) => user.gender)
+        .filter((value, index, self) => self.indexOf(value) === index)
+        .map((gender) => ({
+          text: gender,
+          value: gender,
+        })),
+      onFilter: (value, record) => record.gender === value,
+    },
+    {
+      title: "Vehicles",
+      dataIndex: "vehicles",
+      key: "vehicles",
+      filters: filteredUsers
+        .map((user) => user.vehicles.length)
+        .filter((value, index, self) => self.indexOf(value) === index)
+        .map((numVehicles) => ({
+          text: `${numVehicles} Vehicles`,
+          value: numVehicles,
+        })),
+      onFilter: (value, record) => record.vehicles.length === value,
+      render: (text, record) => record.vehicles.length,
+    },
+  ];
+
+  // Function to fetch suggestions from the API
+  const fetchSuggestions = async (value) => {
+    try {
+      const response = await axios.get(`${API_ENDPOINT}?search=${value}`);
+      const suggestions = response.data.results.map((user) => user.name);
+      setSuggestions(suggestions);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    }
   };
 
   const renderPageNumbers = () => {
@@ -96,130 +187,53 @@ const App = () => {
     );
   };
 
-  // Function to fetch suggestions from the API
-  const fetchSuggestions = async (value) => {
-    try {
-      const response = await axios.get(`${API_ENDPOINT}?search=${value}`);
-      const suggestions = response.data.results.map((user) => user.name);
-      setSuggestions(suggestions);
-    } catch (error) {
-      console.error("Error fetching suggestions:", error);
-    }
-  };
-
   return (
     <div className="App">
-      <Flex justify="space-between" align="center" style={{ width: "100%" }}>
-        <Image
-          src={Logo}
-          width={100}
-          height={100}
-          style={{ borderRadius: "50%" }}
+      <Space direction="vertical" style={{ width: "100%" }}>
+        <Space align="center" style={{ width: "100%" }}>
+          <Image
+            src={Logo}
+            width={100}
+            height={100}
+            style={{ borderRadius: "50%" }}
+          />
+          <Title level={1}>Namify</Title>
+          <div style={{ width: 100 }}></div>
+        </Space>
+        <Paragraph>Uncover Your Digital Identity</Paragraph>
+        <AutoComplete
+          value={searchTerm}
+          options={suggestions.map((value) => ({ value }))}
+          onSelect={(value) => handleSearch(value)}
+          onSearch={fetchSuggestions}
+          allowClear
+          backfill={true}
+        >
+          <Input.Search
+            placeholder="Search by name"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </AutoComplete>
+        {loading && <Spin tip="Loading..." style={{ margin: "5rem" }} />}
+        {error && <p>{error}</p>}
+        {filteredUsers.length === 0 && !loading && <Empty />}
+        <Table
+          dataSource={filteredUsers}
+          columns={columns}
+          loading={loading}
+          pagination={false}
+          rowKey={(record) => record.name}
+          summary={() => (
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0}>Total Users</Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={4}>
+                {filteredUsers.length}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          )}
         />
-        <Title level={1}>Namify</Title>
-        <div style={{ width: 100 }}></div>
-      </Flex>
-
-      <Paragraph>Uncover Your Digital Identity</Paragraph>
-      <AutoComplete
-        value={searchTerm}
-        options={suggestions.map((value) => ({ value }))}
-        onSelect={(value) => handleSearch(value)}
-        onSearch={fetchSuggestions}
-        allowClear
-        backfill={true}
-      >
-        <Input.Search
-          placeholder="Search by name"
-          onChange={(e) => handleSearch(e.target.value)}
-        />
-      </AutoComplete>
-      {loading && <Spin tip="Loading..." style={{ margin: "5rem" }} />}
-      {error && <p>{error}</p>}
-      {filteredUsers.length === 0 && !loading && <Empty />}
-      <Flex className="user-list" gap={30} wrap="flex-wrap">
-        {filteredUsers.map((user) => (
-          <Card
-            key={user.name}
-            hoverable
-            style={{
-              width: 200,
-              marginBottom: 16,
-              backgroundColor:
-                user.hair_color.toLowerCase() === "none"
-                  ? "white"
-                  : user.hair_color,
-              color: ["brown", "black"].includes(user.hair_color.toLowerCase())
-                ? "white"
-                : "black",
-            }}
-            cover={<img alt={user.name} src={getRandomImage()} />}
-          >
-            <Title
-              level={4}
-              style={{
-                color: ["brown", "black"].includes(
-                  user.hair_color.toLowerCase()
-                )
-                  ? "white"
-                  : "black",
-              }}
-              className="card-text"
-            >
-              {user.name}
-            </Title>
-            <Paragraph
-              style={{
-                color: ["brown", "black"].includes(
-                  user.hair_color.toLowerCase()
-                )
-                  ? "white"
-                  : "black",
-              }}
-              className="card-text"
-            >
-              Hair Color: ${user.hair_color}
-            </Paragraph>
-            <Paragraph
-              style={{
-                color: ["brown", "black"].includes(
-                  user.hair_color.toLowerCase()
-                )
-                  ? "white"
-                  : "black",
-              }}
-              className="card-text"
-            >
-              Skin Color: {user.skin_color}
-            </Paragraph>
-            <Paragraph
-              style={{
-                color: ["brown", "black"].includes(
-                  user.hair_color.toLowerCase()
-                )
-                  ? "white"
-                  : "black",
-              }}
-              className="card-text"
-            >
-              Gender: {user.gender}
-            </Paragraph>
-            <Paragraph
-              style={{
-                color: ["brown", "black"].includes(
-                  user.hair_color.toLowerCase()
-                )
-                  ? "white"
-                  : "black",
-              }}
-              className="card-text"
-            >
-              Vehicles: {user.vehicles.length}
-            </Paragraph>
-          </Card>
-        ))}
-      </Flex>
-      <div>{renderPageNumbers()}</div>
+        <div>{renderPageNumbers()}</div>
+      </Space>
     </div>
   );
 };
