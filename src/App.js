@@ -15,7 +15,6 @@ import "antd/dist/reset.css";
 import "./App.css";
 
 const API_ENDPOINT = "https://swapi.dev/api/people";
-const RANDOM_IMAGE_API = "https://picsum.photos/200/300";
 
 const { Title, Paragraph } = Typography;
 
@@ -39,6 +38,11 @@ const App = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getRandomImage = () => {
+    const randomKey = Math.floor(Math.random() * 1000);
+    return `https://picsum.photos/200/300?random=${randomKey}`;
   };
 
   const debounce = (func, delay) => {
@@ -137,7 +141,7 @@ const App = () => {
                 ? "white"
                 : "black",
             }}
-            cover={<img alt={user.name} src={RANDOM_IMAGE_API} />}
+            cover={<img alt={user.name} src={getRandomImage()} />}
           >
             <Title
               level={4}
