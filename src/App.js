@@ -9,7 +9,9 @@ import {
   Input,
   Flex,
   Empty,
+  Image,
 } from "antd";
+import Logo from "./Images/Logo.png";
 
 import "antd/dist/reset.css";
 import "./App.css";
@@ -107,7 +109,17 @@ const App = () => {
 
   return (
     <div className="App">
-      <Title level={1}>Namify</Title>
+      <Flex justify="space-between" align="center" style={{ width: "100%" }}>
+        <Image
+          src={Logo}
+          width={100}
+          height={100}
+          style={{ borderRadius: "50%" }}
+        />
+        <Title level={1}>Namify</Title>
+        <div style={{ width: 100 }}></div>
+      </Flex>
+
       <Paragraph>Uncover Your Digital Identity</Paragraph>
       <AutoComplete
         value={searchTerm}
@@ -122,7 +134,7 @@ const App = () => {
           onChange={(e) => handleSearch(e.target.value)}
         />
       </AutoComplete>
-      {loading && <Spin tip="Loading..." />}
+      {loading && <Spin tip="Loading..." style={{ margin: "5rem" }} />}
       {error && <p>{error}</p>}
       {filteredUsers.length === 0 && !loading && <Empty />}
       <Flex className="user-list" gap={30} wrap="flex-wrap">
