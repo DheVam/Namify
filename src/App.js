@@ -158,7 +158,6 @@ const App = () => {
     },
   ];
 
-  // Function to fetch suggestions from the API
   const fetchSuggestions = async (value) => {
     try {
       const response = await axios.get(`${API_ENDPOINT}?search=${value}`);
